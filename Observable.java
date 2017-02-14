@@ -9,7 +9,7 @@ public class Observable {
     private Subscriber subscriber;
 
     public <U,V> Observable lift(final Observable preObservable,
-                                 final Operator<? extends V, ? super U>
+                                 final Operator<V, U>
                                          operator){
         return new Observable(new OnSubcribe<V>() {
             @Override
@@ -49,9 +49,6 @@ public class Observable {
         void call(Subscriber<? super T> subscriber);
     }
 
-    public interface Operator<U, V> {
-        Subscriber<? super V> operate(Subscriber<? super U> u);
-    }
 
     public static <T> Observable create(OnSubcribe<T> onSubcribe){
         return new Observable(onSubcribe);
@@ -61,7 +58,7 @@ public class Observable {
         Observable.create(new OnSubcribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                String update="update";
+                String update = "update";
                 subscriber.onNext(update);
             }
         }).map(new IFunc<String, String>() {
@@ -69,7 +66,7 @@ public class Observable {
             public String call(String o) {
                 return o+"123";
             }
-        }).subscribe(new Subscriber<Object>() {
+        }).attach(new Subscriber<Object>() {
             @Override
             public void onNext(Object o) {
                 System.out.println((String) o);
