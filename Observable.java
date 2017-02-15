@@ -1,12 +1,73 @@
 package org.rxjava;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Created by hinotohui on 17/2/14.
  */
 public class Observable {
 
+    private static ExecutorService asyncPool= Executors.newFixedThreadPool(4);
+    private static ExecutorService uiPool= Executors.newSingleThreadExecutor();
+
+
     private OnSubcribe onSubcribe;
     private Subscriber subscriber;
+
+    public <V> Observable schedule(){
+        return new Observable(new OnSubcribe<V>() {
+            @Override
+            public void call(final Subscriber<? super V> subscriber) {
+                asyncPool.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        Observable.this.onSubcribe.call(subscriber);
+                    }
+                });
+            }
+        });
+    }
+
+    public <V> Observable onUiThread(){
+        return new Observable(new OnSubcribe<V>() {
+            @Override
+            public void call(final Subscriber<? super V> subscriber) {
+                Observable.this.onSubcribe.call(new Subscriber<V>() {
+                    @Override
+                    public void onNext(final V v) {
+                        uiPool.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                subscriber.onNext(v);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        uiPool.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                subscriber.onComplete();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(final Throwable t) {
+                        uiPool.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                subscriber.onError(t);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
 
     public <U,V> Observable lift(final Observable preObservable,
                                  final Operator<V, U>
