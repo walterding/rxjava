@@ -219,3 +219,14 @@ def commonParse(html=None, xpath=None,root=None):
         #raise e
         return None
 
+    
+'''
+xpath={
+    'headImg':'.//div[@class="space_b_pic_con"]/img->attr[src]',
+    'doctorHospital':'.//div[@class="doc_hospital clearfix"]//p/a[@position=0]->text',
+    'doctorDepartment':'.//div[@class="doc_hospital clearfix"]//p/a[@position=1]->text',
+    'title':'.//p[@class="f22 fyhei tc pb5"]->text',
+    'readNum':'.//p[@id="hits"]->text->int',
+    'summary':'.//div[@class="pb20 article_detail"]->text->substring'
+}
+'''
