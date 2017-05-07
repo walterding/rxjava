@@ -1,5 +1,17 @@
 import bs4,re,builtins
 
+
+def eraseJs(param):
+
+    if param==None:
+        return None
+
+    param=re.sub(r'<script.*>.*</script>','',param)
+    param=re.sub(r'<script.*/>','',param)
+
+    return param
+
+
 def html(xnode):
     if xnode==None:
         return None
@@ -62,7 +74,8 @@ lambdaTable={
     'nextsibling':nextsibling,
     'substract':substract,
     'substring':substring,
-    'html':html
+    'html':html,
+    'eraseJs':eraseJs
 }
 
 class xpathNode:
@@ -117,10 +130,6 @@ class xpathNode:
                         _tempt.append(element)
 
                 results = _tempt
-
-
-            if self.position != None:
-                return [results[self.position]]
 
             return results
 
@@ -205,8 +214,10 @@ def commonParse(html=None, xpath=None,root=None):
             xpathResults = []
 
             for xnode in xpathSearchNodes:
-
                 xpathResults.extend(xpathNode.match(xnode))
+
+            if xpathNode.position != None:
+                xpathResults = [xpathResults[xpathNode.position]]
 
         result=xpathResults
 
@@ -216,17 +227,6 @@ def commonParse(html=None, xpath=None,root=None):
         return result
 
     except Exception as e:
-        #raise e
+        raise e
         return None
 
-    
-'''
-xpath={
-    'headImg':'.//div[@class="space_b_pic_con"]/img->attr[src]',
-    'doctorHospital':'.//div[@class="doc_hospital clearfix"]//p/a[@position=0]->text',
-    'doctorDepartment':'.//div[@class="doc_hospital clearfix"]//p/a[@position=1]->text',
-    'title':'.//p[@class="f22 fyhei tc pb5"]->text',
-    'readNum':'.//p[@id="hits"]->text->int',
-    'summary':'.//div[@class="pb20 article_detail"]->text->substring'
-}
-'''
