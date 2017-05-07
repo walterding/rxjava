@@ -227,6 +227,6 @@ def commonParse(html=None, xpath=None,root=None):
         return result
 
     except Exception as e:
-        raise e
+        #raise e
         return None
 
