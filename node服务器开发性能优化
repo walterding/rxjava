@@ -1,0 +1,31 @@
+最近拜组里开发需要用了node开发web服务，框架选用的是koa，自带路由，nodejs本身工作线程是单线程，但相关阻塞操作可以异步处理并定义回调函数再交由主函数
+处理，同时koa定义了自己的genarator执行器，这个执行器要求对next的传入参数都必须是Promise对象，个人实现了一下这个执行器，执行原理应该如下：
+
+function koaConcurrent(generator) {
+    let gen=generator()
+
+    function next(arg){
+        let result=gen.next(arg)
+
+        if(result.done)
+            return
+
+        result.value.then(next,function(err){
+            console.log(err)
+        })
+    }
+
+    next()
+}
+这样就把原来的异步操作同步化了，同时在阻塞操作时让出了cpu时间片。
+
+但是目前来看单线程运行，性能再高还是没有办法利用好多核机器的优势。之后我们使用了PM2进程管理器，这是一个守护进程，会启动多个子进程处理连接请求，PM2进程
+这个时候会做两件事情，1是监听网络端口，我通过strace跟踪了一下，发现父进程会把accept出来的socket文件描述符通过pipe形式传给子进程，子进程注册进行
+epoll。2是监听子进程进程状态，及时重启子进程（网上有说子进程也是守护进程，这是不对的，子进程的sid还是父进程的pid也就是pm2的pid）
+
+pm2是一个典型主从进程运行的形式（我一开始认为是多进程复用网络套接字），与nginx有点像，这样就能很好的利用多核资源，在开了四个子进程情况下，并发50的前提
+下qps达到270度
+继续优化时候netstat发现127.0.0.1有大量TIME_WAIT连接，应该是本机nginx反向代理没有开keepalive。打开之后，情况消失，同时性能进一步提高，并发50的前
+提下qps达到300以上
+
+目前来看node做web开发没有太大硬伤，虽然gc和jit应该不如java但差距也不大，一些只会写js的程序员中小型服务开发可以优先选择
