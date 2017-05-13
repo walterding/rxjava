@@ -38,7 +38,7 @@ function koaConcurrent(generator) {
 
 pm2是一个典型主从进程运行的形式（我一开始认为是多进程复用网络套接字），
 与nginx有点像，这样就能很好的利用多核资源，在开了四个子进程情况下，
-并发50的前提下qps达到270度
+并发50的前提下qps达到270
 
 继续优化时候netstat发现127.0.0.1有大量TIME_WAIT连接，应该
 是本机nginx反向代理没有开keepalive。打开之后，情况消失，
