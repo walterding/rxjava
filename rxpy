@@ -11,7 +11,7 @@ def mapRx(self,preOnSubscriber):
 
     def mapRx1(subscriber):
         _subscriber=Subscriber()
-        _subscriber.next=next(_subscriber,subscriber,self.callback)
+        _subscriber.next=next(subscriber,self.callback)
 
         preOnSubscriber.call(_subscriber)
     return mapRx1
