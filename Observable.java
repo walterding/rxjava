@@ -16,28 +16,22 @@ public class Observable {
     private OnSubcribe onSubcribe;
     private Subscriber subscriber;
 
-    public <V> Observable schedule(){
-        return new Observable(new OnSubcribe<V>() {
-            @Override
-            public void call(final Subscriber<? super V> subscriber) {
-                asyncPool.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        Observable.this.onSubcribe.call(subscriber);
-                    }
-                });
-            }
-        });
+    public  Observable schedule(){
+        return lift(this,asyncPool);
     }
 
-    public <V> Observable onUiThread(){
+    public Observable onUiThread(){
+        return lift(this,uiPool);
+    }
+
+    public <V> Observable lift(final Observable preObservable,final ExecutorService threadPool){
         return new Observable(new OnSubcribe<V>() {
             @Override
             public void call(final Subscriber<? super V> subscriber) {
-                Observable.this.onSubcribe.call(new Subscriber<V>() {
+                preObservable.onSubcribe.call(new Subscriber<V>() {
                     @Override
                     public void onNext(final V v) {
-                        uiPool.submit(new Runnable() {
+                        threadPool.submit(new Runnable() {
                             @Override
                             public void run() {
                                 subscriber.onNext(v);
@@ -47,17 +41,12 @@ public class Observable {
 
                     @Override
                     public void onComplete() {
-                        uiPool.submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                subscriber.onComplete();
-                            }
-                        });
+                       //
                     }
 
                     @Override
                     public void onError(final Throwable t) {
-                        uiPool.submit(new Runnable() {
+                        threadPool.submit(new Runnable() {
                             @Override
                             public void run() {
                                 subscriber.onError(t);
@@ -116,33 +105,43 @@ public class Observable {
     }
 
     public static void main(String[] args){
-        Observable.create(new OnSubcribe<String>() {
+        Observable.create(new OnSubcribe<byte[]>() {
             @Override
-            public void call(Subscriber<? super String> subscriber) {
-                String update = "update";
-                subscriber.onNext(update);
+            public void call(Subscriber<? super byte[]> subscriber) {
+                byte[] data=OKHttpUtil
+                        .execute("http://zhongyi.sogou.com/tcm?type=qa&id=1");
+                subscriber.onNext(data);
             }
-        }).map(new IFunc<String, String>() {
+        }).schedule().map(new IFunc<byte[], String>() {
             @Override
-            public String call(String o) {
-                return o+"123";
+            public String call(byte[] o) {
+                try {
+                    return new String(o, "utf-8");
+                } catch (Throwable e) {
+                    return null;
+                }
             }
         }).attach(new Subscriber<Object>() {
             @Override
             public void onNext(Object o) {
-                System.out.println((String) o);
+                if (o==null)
+                    return;
+                System.out.println((String)o);
+                //mText.setText(o);
                 onComplete();
             }
 
             @Override
             public void onComplete() {
-                System.out.println("end");
+                //System.out.println("end");
+                asyncPool.shutdown();
+                uiPool.shutdown();
             }
 
             @Override
             public void onError(Throwable t) {
 
             }
-        });
+        }).execute();
     }
 }
