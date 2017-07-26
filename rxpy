@@ -1,0 +1,52 @@
+class Subscriber:
+    def __init__(self):
+        pass
+
+def createRx(self):
+    def createRx1(subscriber):
+        subscriber.next(self.callback())
+    return createRx1
+
+def mapRx(self,preOnSubscriber):
+
+    def mapRx1(subscriber):
+        _subscriber=Subscriber()
+        _subscriber.next=next(_subscriber,subscriber,self.callback)
+
+        preOnSubscriber.call(_subscriber)
+    return mapRx1
+
+def next(subscriber,callback):
+    def next1(result):
+        subscriber.next(callback(result))
+    return next1
+
+class onSubscriber:
+    def __init__(self,callback):
+        self.callback=callback
+
+class Observable:
+
+    def __init__(self,callback):
+        self.onSubscriber=onSubscriber(callback)
+
+    def create(self):
+        self.onSubscriber.call=createRx(self.onSubscriber)
+        return self
+
+    def map(self,callback):
+        observable=Observable(callback)
+        observable.onSubscriber.call=mapRx(observable.onSubscriber,self.onSubscriber)
+
+        return observable
+
+    def attach(self,subscriber):
+        self.subscriber=subscriber
+        return self
+
+    def execute(self):
+        self.onSubscriber.call(self.subscriber)
+
+
+
+
