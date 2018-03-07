@@ -1,0 +1,19 @@
+rx本质就是一个函数递归调用
+
+def ori(x):
+    x=x+"12345"
+    return x
+
+def f(old):
+    return lambda x:len(old(x))
+
+def g(old):
+    return lambda x:5+old(x)
+
+def h(old):
+    return lambda x:str(old(x))+'\thello'
+
+def map(f,g):
+    return f(g)
+
+print(map(h,map(g,map(f,ori)))('abcde'))
