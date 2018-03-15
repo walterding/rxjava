@@ -92,7 +92,11 @@ public class SkipList<K extends Comparable,V>{
         }
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws KeyExistException {
+        SkipList<Integer,String> list=new SkipList<Integer, String>();
+        list.insert(1,"2");
+        list.insert(2,"3");
 
+        System.out.println(list.search(2));
     }
 }
