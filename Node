@@ -31,14 +31,14 @@ public class Node<K extends Comparable,V>  {
 
     public int comPareKey(Node<K,V> node){
         //一个trick，哨兵作为终点默认key最大
-        if (key==null)
+        if (this.key==null)
             return 1;
         return this.key.compareTo(node.key);
     }
 
     public int comPareKey(K key){
         //一个trick，哨兵作为终点默认key最大
-        if(key==null)
+        if(this.key==null)
             return 1;
         return this.key.compareTo(key);
     }
