@@ -26,6 +26,7 @@ public class SkipList<K extends Comparable,V>{
     }
 
     public V search(K key){
+
         Node<K,V> node=this.head;
         Node<K,V> pre=node;
 
@@ -35,7 +36,7 @@ public class SkipList<K extends Comparable,V>{
             while (true){
                 pre=node;
                 node=node.getNext(level);
-
+            
                 int result=node.comPareKey(key);
 
                 if(result==0)
@@ -94,9 +95,14 @@ public class SkipList<K extends Comparable,V>{
 
     public static void main(String[] args) throws KeyExistException {
         SkipList<Integer,String> list=new SkipList<Integer, String>();
-        list.insert(1,"2");
-        list.insert(2,"3");
 
-        System.out.println(list.search(2));
+        for(int i=0;i<100;i++){
+            if(i%2==0)
+                list.insert(i,i+"\tjob");
+            else
+                list.insert(100-i,i+"\tjob");
+        }
+
+        System.out.println(list.search(57));
     }
 }
