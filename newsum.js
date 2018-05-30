@@ -1,9 +1,9 @@
 /**
  * Created by hinotohui on 18/5/22.
  */
-//任意一个无需数列中选取任意数列使得和为指定数字
+//任意一个无需数列中选取任意数列使得和为指定数字，关键点在状态空间和转化为搜索问题的思想
 
-status=[]
+status=[]//状态空间
 
 /*
 {
@@ -18,7 +18,7 @@ function b(i,data,dest){
         status.push([])
 
     if(i==0){
-        let record={'value':data,'record':[data]}
+        let record={'value':data,'records':[data]}
         if(data==dest)
             console.log(JSON.stringify(record))
         status[i].push(record)
@@ -28,8 +28,8 @@ function b(i,data,dest){
         while(j>=0){
             for (let k in status[j]){
 
-                let record={'value':status[j][k]['value']+data,'record':
-                    status[j][k]['record'].concat(data)}
+                let record={'value':status[j][k]['value']+data,'records':
+                    status[j][k]['records'].concat(data)}
 
 
                 status[j+1].push(record)
@@ -44,7 +44,7 @@ function b(i,data,dest){
 
         }
 
-        let record={'value':data,'record':[data]}
+        let record={'value':data,'records':[data]}
         if(data==dest)
             console.log(JSON.stringify(record))
 
@@ -59,7 +59,7 @@ function sum(a,dest){
     }
 }
 
-sum([5,4,7,9,3],14)
+sum([5,4,7,9,3,1,11,2,10,6,-1],12)
 
 
 
