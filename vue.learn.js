@@ -1,6 +1,28 @@
 /**
  * Created by hinotohui on 18/6/6.
  */
+
+/**
+<!doctype html>
+<html>
+<head>
+	<style type="text/css">
+	#test {
+		height: 300px;
+		background-color: red
+	}
+	</style>
+</head>
+<body>
+	<div id="test">
+		<p>
+		         jack{{name}}123
+		</p>
+	</div>
+</body>
+</html>
+*/
+
 function VNode(name,type,parent,textContent,el,context,attrs={}){
 
     this.name=name
