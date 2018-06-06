@@ -1,28 +1,6 @@
 /**
  * Created by hinotohui on 18/6/6.
  */
-
-/**
-<!doctype html>
-<html>
-<head>
-	<style type="text/css">
-	#test {
-		height: 300px;
-		background-color: red
-	}
-	</style>
-</head>
-<body>
-	<div id="test">
-		<p>
-		         jack{{name}}123
-		</p>
-	</div>
-</body>
-</html>
-*/
-
 function VNode(name,type,parent,textContent,el,context,attrs={}){
 
     this.name=name
@@ -34,18 +12,20 @@ function VNode(name,type,parent,textContent,el,context,attrs={}){
     this.textContent=textContent
     this.context=context
 
-    //trick 粗糙的解决
+    //trick
     if(this.type=='text'&&textContent){
         let group=textContent.match(/{{(.+?)}}/)
         if(group){
-            context[group[1].trim()]=(function(that){
+            if(!context[group[1].trim()])
+                context[group[1].trim()]=[]
+            context[group[1].trim()].push((function(that){
 
                 let placeHolder=group[0]
 
                 return function(value){
                     that.el.textContent=that.textContent.replace(placeHolder,value)
                 }
-            })(this)
+            })(this))
         }
     }
 }
@@ -149,7 +129,7 @@ function parseHtml(html,el,context={}){
                     vStack[vStack.length-1],vNodeList[i].textContent,elStack[elStack.length-1]
                         .childNodes[vStack[vStack.length-1].childs.length],context,vNodeList[i].attrs)
 
-            
+
                 elStack.push(elStack[elStack.length-1]
                     .childNodes[vStack[vStack.length-1].childs.length])
 
@@ -180,12 +160,14 @@ function Vue(opt) {
     let data=opt.data
 
     for(let k in data){
-        let callback=this.context[k]||(function(){})
+        let callback=this.context[k]||[]
 
         Object.defineProperty(this,k,{
             enumerable: true,
             configurable: true,
-            set:callback
+            set:function (value) {
+                callback.forEach((f)=>{f(value)})
+            }
         })
 
         this[k]=data[k]
