@@ -1,4 +1,25 @@
-/**
+<!doctype html>
+<html>
+<head>
+	<style type="text/css">
+	#test {
+		height: 300px;
+		background-color: red
+	}
+	</style>
+</head>
+<body>
+	<div id="test">   <div>
+		         jack{{name}}123
+		         <p>{{name}}</p>
+		</div>
+		{{name}}
+	</div>
+</body>
+</html>
+
+<script type="text/javascript">
+	/**
  * Created by hinotohui on 18/6/6.
  */
 function VNode(name,type,parent,textContent,el,context,attrs={}){
@@ -184,3 +205,5 @@ let vm=new Vue({
 setTimeout(()=>{
     vm.name='dinghui'
 },1000)
+
+</script>
