@@ -1,5 +1,3 @@
-rx本质就是一个函数嵌套调用
-
 def ori(x):
     x=x+"12345"
     return x
